@@ -9,7 +9,7 @@
 "use strict";
 
 var quickmove = (function() {
-  const ADDON_ID = "quickmove@mozilla.kewis.ch";
+  const ADDON_ID = "qfm-classic@betterbird.eu";
 
   let { MultiSuffixTree } = ChromeUtils.import("resource:///modules/gloda/SuffixTree.jsm");
   let { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
@@ -131,7 +131,7 @@ var quickmove = (function() {
      * Event listener method to be called when the 'move to' or 'copy to'
      * context menu is shown.
      */
-    popupshowing: function(event) {
+    popupshowing: function(event, useDocument = false) {
       if (event.target.getAttribute("ignorekeys") != "true") {
         // If we are showing the menuitems, then don't set up the folders but
         // keep the old list.
@@ -153,12 +153,13 @@ var quickmove = (function() {
         event.target.firstChild.value = initialText;
         quickmove.dirty = false;
         if (initialText) {
-          quickmove.search(event.target.firstChild);
+          quickmove.search(event.target.firstChild, useDocument);
         } else {
           quickmove.addFolders(
             quickmove.recentFolders,
             event.target,
-            event.target.firstChild.value
+            event.target.firstChild.value,
+            useDocument
           );
         }
       });
@@ -178,7 +179,7 @@ var quickmove = (function() {
      * @param popup       The popup to add to
      * @param targetValue The searched text
      */
-    addFolders: async function(folders, popup, targetValue) {
+    addFolders: async function(folders, popup, targetValue, useDocument) {
       let dupeMap = {};
       let serverMap = {};
       let fullPathMap = {};
@@ -215,8 +216,15 @@ var quickmove = (function() {
 
       // Now add each folder, appending the server name if the folder name
       // itself would appear more than once.
+      let doc;
+      if (useDocument) {
+        doc = document;
+      } else {
+        let tabmail = window.top.document.getElementById("tabmail");
+        doc = tabmail?.currentAbout3Pane?.document;
+      }
       for (let folder of folders) {
-        let node = document.createXULElement("menuitem");
+        let node = doc.createXULElement("menuitem");
         if (doNotCrop) {
           node.setAttribute("crop", "none");
         }
@@ -326,7 +334,7 @@ var quickmove = (function() {
      * Perform a search. If no search term is entered, the recent folders are
      * shown, otherwise folders which match the search term are shown.
      */
-    search: function(textboxNode) {
+    search: function(textboxNode, useDocument) {
       let popup = textboxNode.parentNode;
       Quickmove.clearItems(popup);
       dump(`=== text |${textboxNode.value}|\n`);
@@ -335,7 +343,7 @@ var quickmove = (function() {
           .findMatches(textboxNode.value.toLowerCase())
           .filter(x => x.canFileMessages);
         if (folders.length) {
-          quickmove.addFolders(folders, popup, textboxNode.value);
+          quickmove.addFolders(folders, popup, textboxNode.value, useDocument);
         } else {
           let node = document.createXULElement("menuitem");
           node.setAttribute("disabled", "true");
@@ -344,7 +352,7 @@ var quickmove = (function() {
           popup.appendChild(node);
         }
       } else {
-        quickmove.addFolders(quickmove.recentFolders, popup, textboxNode.value);
+        quickmove.addFolders(quickmove.recentFolders, popup, textboxNode.value, useDocument);
       }
 
       // The search is done, reset the dirty count and call the search complete
@@ -356,8 +364,8 @@ var quickmove = (function() {
       }
     },
 
-    searchDelayed: Quickmove.debounce(textboxNode => {
-      quickmove.search(textboxNode);
+    searchDelayed: Quickmove.debounce(function(textboxNode, useDocument = false) {
+      quickmove.search(textboxNode, useDocument);
     }, 500),
 
     executeCopy: function(folder) {
@@ -366,17 +374,34 @@ var quickmove = (function() {
 
     executeMove: async function(folder, copyNotMove) {
       if (copyNotMove) {
-        MsgCopyMessage(folder);
+        // MsgCopyMessage(folder); // Doesn't exist any more.
+        let tabmail = window.top.document.getElementById("tabmail");
+        tabmail.currentAbout3Pane.gDBView.doCommandWithFolder(
+          Ci.nsMsgViewCommandType.copyMessages,
+          folder
+        );
       } else {
-        if (await Quickmove.getPref("markAsRead", true)) {
-          MsgMarkMsgAsRead(true);
-        }
-        MsgMoveMessage(folder);
+        // if (await Quickmove.getPref("markAsRead", true)) {
+        //   MsgMarkMsgAsRead(true);  // Has moved elsewhere.
+        // }
+        // MsgMoveMessage(folder); // Doesn't exist any more.
+        let tabmail = window.top.document.getElementById("tabmail");
+        tabmail.currentAbout3Pane.gDBView.doCommandWithFolder(
+          Ci.nsMsgViewCommandType.moveMessages,
+          folder
+        );
       }
     },
 
     executeGoto: function(folder) {
-      gFolderTreeView.selectFolder(folder, true);
+      // This doesn't work in 115 any more.
+      // gFolderTreeView.selectFolder(folder, true);
+      // Apparently there is no replacement yet.
+      // So we use a trick from here:
+      // https://searchfox.org/comm-central/search?q=tab.*folder+%3D+folder&path=&case=false&regexp=true
+      let tabmail = window.top.document.getElementById("tabmail");
+      let tab = tabmail.currentTabInfo;
+      tab.folder = folder;
     },
 
     focus: function(event) {
@@ -469,7 +494,8 @@ var quickmove = (function() {
 
     openFile: function() {
       let filebutton = document.getElementById("button-file");
-      let threadTree = document.getElementById("threadTree");
+      let tabmail = top.document.getElementById("tabmail");
+      let threadTree = tabmail?.currentAbout3Pane?.threadTree;
       let messagepane = document.getElementById("messagepane");
       if (filebutton) {
         // There is a file button, open its popup
@@ -478,12 +504,12 @@ var quickmove = (function() {
       } else if (threadTree) {
         // If there is a thread tree (i.e mail 3pane), then use it
         let filepopup = document.getElementById("quickmove-menupopup");
-        let threadTreeCols = document.getElementById("threadCols");
-        let selection = threadTree.view.selection;
-        let rowOffset =
-          threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
-          threadTreeCols.clientHeight;
-        filepopup.openPopup(threadTree, "overlap", threadTreeCols.clientHeight, rowOffset);
+        // let threadTreeCols = document.getElementById("threadCols");
+        // let selection = threadTree.view.selection;
+        // let rowOffset =
+          // threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
+          // threadTreeCols.clientHeight;
+        filepopup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
       } else if (messagepane) {
         let filepopup = document.getElementById("quickmove-menupopup");
         filepopup.openPopup(messagepane, "overlap");
@@ -492,6 +518,7 @@ var quickmove = (function() {
       }
     },
 
+    // Needs work. quickmove-folderlocation-menupopup was renamed.
     openGoto: function() {
       let folderLocation = document.getElementById("locationFolders");
       let folderTree = document.getElementById("folderTree");

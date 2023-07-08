@@ -1,20 +1,15 @@
 {
   "manifest_version": 2,
-  "name": "__MSG_extensionName__",
+  "name": "Quick Folder Move Classic",
   "description": "__MSG_extensionDescription__",
-  "version": "1.10.0",
+  "version": "1.100.0",
   "default_locale": "en",
-  "author": "Philipp Kewisch",
-  "applications": {
-    "gecko": {
-      "id": "quickmove@mozilla.kewis.ch",
-      "strict_min_version": "91.0a1"
-    }
-  },
+  "author": "The Betterbird Project, original author: Philipp Kewisch",
   "browser_specific_settings": {
     "gecko": {
-      "id": "quickmove@mozilla.kewis.ch",
-      "strict_min_version": "91.0a1"
+      "id": "qfm-classic@betterbird.eu",
+      "strict_min_version": "115.0a1",
+      "strict_max_version": "115.*"
     }
   },
   "icons": {

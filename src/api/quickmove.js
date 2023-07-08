@@ -36,38 +36,38 @@ function initKeys(window, document) {
     window.MozXULElement.parseXULToFragment(`
       <menupopup id="quickmove-menupopup"
              ignorekeys="true"
-             onpopupshowing="quickmove.popupshowing(event)"
+             onpopupshowing="quickmove.popupshowing(event, true)"
              onpopupshown="quickmove.popupshown(event)"
              onpopuphidden="quickmove.hide(event.target)"
              oncommand="quickmove.command(event, quickmove.executeMove)">
         <html:input class="quickmove-textbox"
                     onfocus="quickmove.focus(event)"
                     onkeypress="quickmove.keypress(event, quickmove.executeMove)"
-                    oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                    oninput="quickmove.searchDelayed(event.target, true); event.stopPropagation();"/>
         <menuseparator class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-goto-menupopup"
                  ignorekeys="true"
-                 onpopupshowing="quickmove.popupshowing(event)"
+                 onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"
                  oncommand="quickmove.command(event, quickmove.executeGoto)">
         <html:input class="quickmove-textbox"
                     onfocus="quickmove.focus(event)"
                     onkeypress="quickmove.keypress(event, quickmove.executeGoto)"
-                    oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                    oninput="quickmove.searchDelayed(event.target, true); event.stopPropagation();"/>
         <menuseparator id="quickmove-goto-separator" class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-copy-menupopup"
                  ignorekeys="true"
-                 onpopupshowing="quickmove.popupshowing(event)"
+                 onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"
                  oncommand="quickmove.command(event, quickmove.executeCopy)">
         <html:input class="quickmove-textbox"
                     onfocus="quickmove.focus(event)"
                     onkeypress="quickmove.keypress(event, quickmove.executeCopy)"
-                    oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                    oninput="quickmove.searchDelayed(event.target, true); event.stopPropagation();"/>
         <menuseparator id="quickmove-copy-separator" class="quickmove-separator"/>
       </menupopup>
     `)
@@ -124,36 +124,43 @@ function initButtonFile(window, document) {
 }
 
 function initContextMenus(window, document) {
-  let moveMenu = document.getElementById("mailContext-moveMenu");
+  let tabmail = window.top.document.getElementById("tabmail");
+  let doc = tabmail?.currentAbout3Pane?.document;
+  if (!doc) {
+    console.log("QFM: tabmail not initialised yet");
+    return;
+  }
+  let moveMenu = doc.getElementById("mailContext-moveMenu");
   let quickMoveFileHere = window.MozXULElement.parseXULToFragment(`
     <menupopup id="quickmove-context-menupopup"
                ignorekeys="true"
-               onpopupshowing="quickmove.popupshowing(event)"
-               onpopupshown="quickmove.popupshown(event)"
-               onpopuphidden="quickmove.hide(event.target)"
-               oncommand="quickmove.command(event, quickmove.executeMove, true)">
+               onpopupshowing="top.quickmove.popupshowing(event)"
+               onpopupshown="top.quickmove.popupshown(event)"
+               onpopuphidden="top.quickmove.hide(event.target)"
+               oncommand="top.quickmove.command(event, quickmove.executeMove, true)">
       <html:input class="quickmove-textbox"
-                  onfocus="quickmove.focus(event)"
-                  onkeypress="quickmove.keypress(event, quickmove.executeMove)"
-                  oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                  onfocus="top.quickmove.focus(event)"
+                  onkeypress="top.quickmove.keypress(event, quickmove.executeMove)"
+                  oninput="top.quickmove.searchDelayed(event.target); event.stopPropagation();"/>
       <menuseparator class="quickmove-separator"/>
     </menupopup>
   `);
 
   let oldMovePopup = moveMenu.replaceChild(quickMoveFileHere, moveMenu.menupopup);
 
-  let copyMenu = document.getElementById("mailContext-copyMenu");
+  let copyMenu = doc.getElementById("mailContext-copyMenu");
+  if (!copyMenu) return;
   let quickMoveCopyHere = window.MozXULElement.parseXULToFragment(`
     <menupopup id="quickmove-context-copy-menupopup"
                ignorekeys="true"
-               onpopupshowing="quickmove.popupshowing(event)"
-               onpopupshown="quickmove.popupshown(event)"
-               onpopuphidden="quickmove.hide(event.target)"
-               oncommand="quickmove.command(event, quickmove.executeCopy, true)">
+               onpopupshowing="top.quickmove.popupshowing(event)"
+               onpopupshown="top.quickmove.popupshown(event)"
+               onpopuphidden="top.quickmove.hide(event.target)"
+               oncommand="top.quickmove.command(event, quickmove.executeCopy, true)">
       <html:input class="quickmove-textbox"
-                  onfocus="quickmove.focus(event)"
-                  onkeypress="quickmove.keypress(event, quickmove.executeCopy)"
-                  oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                  onfocus="top.quickmove.focus(event)"
+                  onkeypress="top.quickmove.keypress(event, quickmove.executeCopy)"
+                  oninput="top.quickmove.searchDelayed(event.target); event.stopPropagation();"/>
       <menuseparator class="quickmove-separator"/>
     </menupopup>
   `);
@@ -161,40 +168,48 @@ function initContextMenus(window, document) {
   let oldCopyPopup = copyMenu.replaceChild(quickMoveCopyHere, copyMenu.menupopup);
 
   window.quickmove.cleanup.push(() => {
-    quickMoveFileHere = document.getElementById("quickmove-context-menupopup");
+    quickMoveFileHere = doc.getElementById("quickmove-context-menupopup");
     quickMoveFileHere.parentNode.replaceChild(oldMovePopup, quickMoveFileHere);
 
-    quickMoveCopyHere = document.getElementById("quickmove-context-copy-menupopup");
+    quickMoveCopyHere = doc.getElementById("quickmove-context-copy-menupopup");
     quickMoveCopyHere.parentNode.replaceChild(oldCopyPopup, quickMoveCopyHere);
   });
 }
 
 function initFolderLocation(window, document) {
   let quickmoveLocationPopup = window.MozXULElement.parseXULToFragment(`
-    <menupopup id="quickmove-folderlocation-menupopup"
+    <menupopup id="toolbarFolderLocationPopup"
                ignorekeys="true"
-               onpopupshowing="quickmove.popupshowing(event)"
+               onpopupshowing="quickmove.popupshowing(event, true)"
                onpopupshown="quickmove.popupshown(event)"
                onpopuphidden="quickmove.hide(event.target)"
                oncommand="quickmove.command(event, quickmove.executeGoto)">
       <html:input class="quickmove-textbox"
                   onfocus="quickmove.focus(event)"
                   onkeypress="quickmove.keypress(event, quickmove.executeGoto)"
-                  oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
+                  oninput="quickmove.searchDelayed(event.target, true); event.stopPropagation();"/>
       <menuseparator id="quickmove-location-separator" class="quickmove-separator"/>
     </menupopup>
   `);
 
-  let palette = document.getElementById("mail-toolbox").palette;
+  // let palette = document.getElementById("mail-toolbox").palette;
 
   let folderLocationPopup =
-    document.getElementById("folderLocationPopup") || palette.querySelector("#folderLocationPopup");
-  folderLocationPopup.setAttribute("hidden", "true");
+    document.getElementById("toolbarFolderLocationPopup"); // || palette.querySelector("#folderLocationPopup");
+  if (!folderLocationPopup) {
+    console.log("QFM: folderLocationPopup not initialised yet");
+    return;
+  }
+  folderLocationPopup.setAttribute("id", "toolbarFolderLocationPopup-retired");
 
+  /*
   let locationFolders =
-    document.getElementById("locationFolders") || palette.querySelector("#locationFolders");
+    doc.getElementById("locationFolders") || palette.querySelector("#locationFolders");
   locationFolders.appendChild(quickmoveLocationPopup);
+  */
+  folderLocationPopup.parentNode.appendChild(quickmoveLocationPopup);
 
+  /* Too hard.
   window.quickmove.cleanup.push(() => {
     folderLocationPopup =
       document.getElementById("folderLocationPopup") ||
@@ -206,6 +221,7 @@ function initFolderLocation(window, document) {
       palette.querySelector("#quickmove-folderlocation-menupopup");
     quickmoveLocationPopup.remove();
   });
+  */
 }
 
 this.quickmove = class extends ExtensionAPI {
@@ -231,13 +247,16 @@ this.quickmove = class extends ExtensionAPI {
         initCSS(window, document);
         initKeys(window, document);
 
-        initButtonFile(window, document);
-        initContextMenus(window, document);
+        // initButtonFile(window, document);
+        // The following call needs tabmail setup, so it won't work straight away.
+        // Hack it with a timeout for now. Maybe we can listen to some event instead.
+        // Those popups don't work, so no need to initialise them.
+        window.setTimeout(() => initContextMenus(window, document), 1000);
 
         if (window.location.href.startsWith("chrome://messenger/content/messageWindow.")) {
           document.getElementById("quickmove-goto").remove();
         } else if (window.location.href.startsWith("chrome://messenger/content/messenger.")) {
-          initFolderLocation(window, document);
+          window.setTimeout(() => initFolderLocation(window, document), 1000);
         }
       },
     });
