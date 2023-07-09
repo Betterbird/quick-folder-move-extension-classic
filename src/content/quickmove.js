@@ -375,21 +375,15 @@ var quickmove = (function() {
     executeMove: async function(folder, copyNotMove) {
       if (copyNotMove) {
         // MsgCopyMessage(folder); // Doesn't exist any more.
-        let tabmail = window.top.document.getElementById("tabmail");
-        tabmail.currentAbout3Pane.gDBView.doCommandWithFolder(
-          Ci.nsMsgViewCommandType.copyMessages,
-          folder
-        );
+        goDoCommand('cmd_copyMessage', folder);
       } else {
+        // XXX TODO: Mark as read.
         // if (await Quickmove.getPref("markAsRead", true)) {
         //   MsgMarkMsgAsRead(true);  // Has moved elsewhere.
         // }
+
         // MsgMoveMessage(folder); // Doesn't exist any more.
-        let tabmail = window.top.document.getElementById("tabmail");
-        tabmail.currentAbout3Pane.gDBView.doCommandWithFolder(
-          Ci.nsMsgViewCommandType.moveMessages,
-          folder
-        );
+        goDoCommand('cmd_moveMessage', folder);
       }
     },
 
@@ -399,7 +393,7 @@ var quickmove = (function() {
       // Apparently there is no replacement yet.
       // So we use a trick from here:
       // https://searchfox.org/comm-central/search?q=tab.*folder+%3D+folder&path=&case=false&regexp=true
-      let tabmail = window.top.document.getElementById("tabmail");
+      let tabmail = document.getElementById("tabmail");
       let tab = tabmail.currentTabInfo;
       tab.folder = folder;
     },
@@ -496,8 +490,7 @@ var quickmove = (function() {
       // The desired behaviour (as for TB/BB 102) is this:
       // Shift+M/Y open over the thread pane or the stand-alone message.
       // Shift+G open over the folder tree.
-      // XXX TODO: Make it work for stand-alone messages.
-      let tabmail = top.document.getElementById("tabmail");
+      let tabmail = document.getElementById("tabmail");
       let currentAbout3Pane = tabmail?.currentAbout3Pane;
       let currentAboutMessage = tabmail?.currentAboutMessage;
       let threadTree = currentAbout3Pane?.threadTree;
