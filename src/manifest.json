@@ -8,6 +8,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "qfm-classic@betterbird.eu",
+      "update_url": "https://www.betterbird.eu/downloads/Addons/updates.json",
       "strict_min_version": "115.0a1",
       "strict_max_version": "115.*"
     }
