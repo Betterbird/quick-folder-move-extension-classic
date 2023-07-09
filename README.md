@@ -12,3 +12,5 @@ The main purpose is to use the keyboard for triaging emails, but of course you c
 This is a fork of the [original Quick Folder Move](https://github.com/kewisch/quickmove-extension/) by Philipp Kewisch.
 We forked it to maintain the original WebExtension **Experiment** version as shipped for Thunderbird/Betterbird 91 and 102
 for as long as possible.
+
+Download the add-on from the [Betterbird add-ons page](https://www.betterbird.eu/addons/).
