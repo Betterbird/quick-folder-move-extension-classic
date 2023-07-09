@@ -91,15 +91,17 @@ function initKeys(window, document) {
   });
 }
 
-function initContextMenus(window, document) {
+function initContextMenus(window, document, standAlone) {
   let tabmail = window.top.document.getElementById("tabmail");
-  let doc = tabmail?.currentAbout3Pane?.document;
+  let doc = standAlone ? document.getElementById("messageBrowser").contentDocument
+                       : tabmail?.currentAbout3Pane?.document;
   if (!doc) {
     console.log("QFM: tabmail not initialised yet");
     return;
   }
   let moveMenu = doc.getElementById("mailContext-moveMenu");
   if (!moveMenu) {
+    console.log("QFM: mailContext-moveMenu not found");
     return;
   }
   let quickMoveFileHere = window.MozXULElement.parseXULToFragment(`
@@ -121,6 +123,7 @@ function initContextMenus(window, document) {
 
   let copyMenu = doc.getElementById("mailContext-copyMenu");
   if (!copyMenu) {
+    console.log("QFM: mailContext-copyMenu not found");
     return;
   }
   let quickMoveCopyHere = window.MozXULElement.parseXULToFragment(`
@@ -211,14 +214,16 @@ this.quickmove = class extends ExtensionAPI {
         initCSS(window, document);
         initKeys(window, document);
 
+        let standAlone = window.location.href.startsWith("chrome://messenger/content/messageWindow.");
+
         // The following call needs tabmail setup, so it won't work straight away.
         // Hack it with a timeout for now. Maybe we can listen to some event instead.
-        window.setTimeout(() => initContextMenus(window, document), 5000);
+        window.setTimeout(() => initContextMenus(window, document, standAlone), 3000);
 
-        if (window.location.href.startsWith("chrome://messenger/content/messageWindow.")) {
+        if (standAlone) {
           document.getElementById("quickmove-goto").remove();
-        } else if (window.location.href.startsWith("chrome://messenger/content/messenger.")) {
-          window.setTimeout(() => initFolderLocation(window, document), 1000);
+        } else {
+          window.setTimeout(() => initFolderLocation(window, document), 3000);
         }
       },
     });

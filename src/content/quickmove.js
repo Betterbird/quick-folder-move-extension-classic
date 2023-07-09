@@ -501,7 +501,8 @@ var quickmove = (function() {
       let currentAbout3Pane = tabmail?.currentAbout3Pane;
       let currentAboutMessage = tabmail?.currentAboutMessage;
       let threadTree = currentAbout3Pane?.threadTree;
-      let messagepane = currentAboutMessage?.document.getElementById("messagepane");
+      let doc = currentAboutMessage?.document || document.getElementById("messageBrowser").contentDocument;
+      let messagepane = doc?.getElementById("messagepane");
       let folderTree = currentAbout3Pane?.document.getElementById("folderTree");
       // console.log(currentAbout3Pane, currentAboutMessage, threadTree, messagepane, folderTree);
       if (!preferFolderTree && threadTree) {
