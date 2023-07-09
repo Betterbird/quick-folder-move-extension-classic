@@ -492,18 +492,14 @@ var quickmove = (function() {
       quickmove.hide(popup, isContext);
     },
 
-    openFile: function() {
-      let filebutton = document.getElementById("button-file");
+    openMove: function() {
       let tabmail = top.document.getElementById("tabmail");
       let threadTree = tabmail?.currentAbout3Pane?.threadTree;
       let messagepane = document.getElementById("messagepane");
-      if (filebutton) {
-        // There is a file button, open its popup
-        let filepopup = document.getElementById("quickmove-filebutton-menupopup");
-        filepopup.openPopup(filebutton, "after_start");
-      } else if (threadTree) {
+      if (threadTree) {
         // If there is a thread tree (i.e mail 3pane), then use it
         let filepopup = document.getElementById("quickmove-menupopup");
+        // XXX TODO.
         // let threadTreeCols = document.getElementById("threadCols");
         // let selection = threadTree.view.selection;
         // let rowOffset =
@@ -518,7 +514,7 @@ var quickmove = (function() {
       }
     },
 
-    // Needs work. quickmove-folderlocation-menupopup was renamed.
+    // XXX TODO: Needs work. quickmove-folderlocation-menupopup was renamed.
     openGoto: function() {
       let folderLocation = document.getElementById("locationFolders");
       let folderTree = document.getElementById("folderTree");
@@ -534,17 +530,19 @@ var quickmove = (function() {
     },
 
     openCopy: function() {
-      let threadTree = document.getElementById("threadTree");
+      let tabmail = top.document.getElementById("tabmail");
+      let threadTree = tabmail?.currentAbout3Pane?.threadTree;
       let messagepane = document.getElementById("messagepane");
       if (threadTree) {
         // If there is a thread tree (i.e mail 3pane), then use it
         let filepopup = document.getElementById("quickmove-copy-menupopup");
-        let threadTreeCols = document.getElementById("threadCols");
-        let selection = threadTree.view.selection;
-        let rowOffset =
-          threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
-          threadTreeCols.clientHeight;
-        filepopup.openPopup(threadTree, "overlap", threadTreeCols.clientHeight, rowOffset);
+        // XXX TODO.
+        // let threadTreeCols = document.getElementById("threadCols");
+        // let selection = threadTree.view.selection;
+        // let rowOffset =
+          // threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
+          // threadTreeCols.clientHeight;
+        filepopup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
       } else if (messagepane) {
         let filepopup = document.getElementById("quickmove-copy-menupopup");
         filepopup.openPopup(messagepane, "overlap");

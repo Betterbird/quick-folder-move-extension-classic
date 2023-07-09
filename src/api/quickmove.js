@@ -76,7 +76,7 @@ function initKeys(window, document) {
   document.getElementById("mailKeys").appendChild(
     window.MozXULElement.parseXULToFragment(`
       <keyset id="quickmove-keyset">
-        <key id="quickmove-file" key="M" modifiers="shift" oncommand="quickmove.openFile()"/>
+        <key id="quickmove-file" key="M" modifiers="shift" oncommand="quickmove.openMove()"/>
         <key id="quickmove-goto" key="G" modifiers="shift" oncommand="quickmove.openGoto()"/>
         <key id="quickmove-copy" key="Y" modifiers="shift" oncommand="quickmove.openCopy()"/>
       </keyset>
@@ -88,38 +88,6 @@ function initKeys(window, document) {
     document.getElementById("quickmove-menupopup").remove();
     document.getElementById("quickmove-copy-menupopup").remove();
     document.getElementById("quickmove-goto-menupopup").remove();
-  });
-}
-
-function initButtonFile(window, document) {
-  let buttonFile =
-    document.getElementById("button-file") ||
-    document.getElementById("mail-toolbox").palette.querySelector("#button-file");
-
-  let buttonFilePopup = window.MozXULElement.parseXULToFragment(`
-    <menupopup id="quickmove-filebutton-menupopup"
-               ignorekeys="true"
-               onpopupshowing="quickmove.popupshowing(event)"
-               onpopupshown="quickmove.popupshown(event)"
-               onpopuphidden="quickmove.hide(event.target)">
-      <html:input class="quickmove-textbox"
-                  onfocus="quickmove.focus(event)"
-                  onkeypress="quickmove.keypress(event, quickmove.executeMove)"
-                  oninput="quickmove.searchDelayed(event.target); event.stopPropagation();"/>
-      <menuseparator id="quickmove-filebutton-separator" class="quickmove-separator"/>
-    </menupopup>
-  `);
-
-  let menupopup = buttonFile.querySelector("#button-filePopup") || buttonFile.children[0];
-  buttonFilePopup.oldPopup = buttonFile.replaceChild(buttonFilePopup, menupopup);
-
-  window.quickmove.cleanup.push(() => {
-    buttonFile =
-      document.getElementById("button-file") ||
-      document.getElementById("mail-toolbox").palette.querySelector("#button-file");
-
-    let popup = buttonFile.querySelector("#quickmove-filebutton-menupopup");
-    popup.parentNode.replaceChild(popup.oldPopup, popup);
   });
 }
 
@@ -192,24 +160,16 @@ function initFolderLocation(window, document) {
     </menupopup>
   `);
 
-  // let palette = document.getElementById("mail-toolbox").palette;
-
   let folderLocationPopup =
-    document.getElementById("toolbarFolderLocationPopup"); // || palette.querySelector("#folderLocationPopup");
+    document.getElementById("toolbarFolderLocationPopup");
   if (!folderLocationPopup) {
     console.log("QFM: folderLocationPopup not initialised yet");
     return;
   }
   folderLocationPopup.setAttribute("id", "toolbarFolderLocationPopup-retired");
-
-  /*
-  let locationFolders =
-    doc.getElementById("locationFolders") || palette.querySelector("#locationFolders");
-  locationFolders.appendChild(quickmoveLocationPopup);
-  */
   folderLocationPopup.parentNode.appendChild(quickmoveLocationPopup);
 
-  /* Too hard.
+  /* XXX TODO: Too hard.
   window.quickmove.cleanup.push(() => {
     folderLocationPopup =
       document.getElementById("folderLocationPopup") ||
@@ -247,10 +207,8 @@ this.quickmove = class extends ExtensionAPI {
         initCSS(window, document);
         initKeys(window, document);
 
-        // initButtonFile(window, document);
         // The following call needs tabmail setup, so it won't work straight away.
         // Hack it with a timeout for now. Maybe we can listen to some event instead.
-        // Those popups don't work, so no need to initialise them.
         window.setTimeout(() => initContextMenus(window, document), 1000);
 
         if (window.location.href.startsWith("chrome://messenger/content/messageWindow.")) {
