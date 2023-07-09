@@ -499,15 +499,14 @@ var quickmove = (function() {
       let folderTree = currentAbout3Pane?.document.getElementById("folderTree");
       // console.log(currentAbout3Pane, currentAboutMessage, threadTree, messagepane, folderTree);
       if (!preferFolderTree && threadTree) {
-        // If there is a thread tree (i.e mail 3pane), then use it
-        // XXX TODO.
-        // let threadTreeCols = document.getElementById("threadCols");
-        // let selection = threadTree.view.selection;
-        // let rowOffset =
-          // threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
-          // threadTreeCols.clientHeight;
+        // If there is a thread tree (i.e mail 3pane), then use it.
+        let selection = threadTree.view.selection;
+        let height = threadTree.querySelector("#threadTree-row0")?.clientHeight || 0;
+        let headerHeight = threadTree.querySelector(".tree-table-header").clientHeight;
+        let rowOffset =
+          height * (selection.currentIndex - threadTree.getFirstVisibleIndex() + 1) + headerHeight;
         let popup = document.getElementById(popupName);
-        popup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
+        popup.openPopup(threadTree, "overlap", headerHeight, rowOffset);
       } else if (!preferFolderTree && messagepane) {
         let popup = document.getElementById(popupName);
         popup.openPopup(messagepane, "overlap");
