@@ -34,7 +34,7 @@ function initCSS(window, document) {
 function initKeys(window, document) {
   document.getElementById("mainPopupSet").appendChild(
     window.MozXULElement.parseXULToFragment(`
-      <menupopup id="quickmove-menupopup"
+      <menupopup id="quickmove-move-menupopup"
              ignorekeys="true"
              onpopupshowing="quickmove.popupshowing(event, true)"
              onpopupshown="quickmove.popupshown(event)"
@@ -85,7 +85,7 @@ function initKeys(window, document) {
 
   window.quickmove.cleanup.push(() => {
     document.getElementById("quickmove-keyset").remove();
-    document.getElementById("quickmove-menupopup").remove();
+    document.getElementById("quickmove-move-menupopup").remove();
     document.getElementById("quickmove-copy-menupopup").remove();
     document.getElementById("quickmove-goto-menupopup").remove();
   });
@@ -99,6 +99,9 @@ function initContextMenus(window, document) {
     return;
   }
   let moveMenu = doc.getElementById("mailContext-moveMenu");
+  if (!moveMenu) {
+    return;
+  }
   let quickMoveFileHere = window.MozXULElement.parseXULToFragment(`
     <menupopup id="quickmove-context-menupopup"
                ignorekeys="true"
@@ -117,7 +120,9 @@ function initContextMenus(window, document) {
   let oldMovePopup = moveMenu.replaceChild(quickMoveFileHere, moveMenu.menupopup);
 
   let copyMenu = doc.getElementById("mailContext-copyMenu");
-  if (!copyMenu) return;
+  if (!copyMenu) {
+    return;
+  }
   let quickMoveCopyHere = window.MozXULElement.parseXULToFragment(`
     <menupopup id="quickmove-context-copy-menupopup"
                ignorekeys="true"
@@ -163,25 +168,24 @@ function initFolderLocation(window, document) {
   let folderLocationPopup =
     document.getElementById("toolbarFolderLocationPopup");
   if (!folderLocationPopup) {
-    console.log("QFM: folderLocationPopup not initialised yet");
+    console.log("QFM: toolbarFolderLocationPopup not initialised yet");
     return;
   }
   folderLocationPopup.setAttribute("id", "toolbarFolderLocationPopup-retired");
   folderLocationPopup.parentNode.appendChild(quickmoveLocationPopup);
 
-  /* XXX TODO: Too hard.
   window.quickmove.cleanup.push(() => {
-    folderLocationPopup =
-      document.getElementById("folderLocationPopup") ||
-      palette.querySelector("#folderLocationPopup");
-    folderLocationPopup.removeAttribute("hidden");
-
-    quickmoveLocationPopup =
-      document.getElementById("quickmove-folderlocation-menupopup") ||
-      palette.querySelector("#quickmove-folderlocation-menupopup");
-    quickmoveLocationPopup.remove();
+    let folderLocationPopupRetired =
+      document.getElementById("toolbarFolderLocationPopup-retired");
+    if (folderLocationPopupRetired) {
+      let folderLocationPopup =
+        document.getElementById("toolbarFolderLocationPopup");
+      if (folderLocationPopup) {
+        folderLocationPopup.remove();
+      }
+      folderLocationPopupRetired.setAttribute("id", "toolbarFolderLocationPopup");
+    }
   });
-  */
 }
 
 this.quickmove = class extends ExtensionAPI {
@@ -209,7 +213,7 @@ this.quickmove = class extends ExtensionAPI {
 
         // The following call needs tabmail setup, so it won't work straight away.
         // Hack it with a timeout for now. Maybe we can listen to some event instead.
-        window.setTimeout(() => initContextMenus(window, document), 1000);
+        window.setTimeout(() => initContextMenus(window, document), 5000);
 
         if (window.location.href.startsWith("chrome://messenger/content/messageWindow.")) {
           document.getElementById("quickmove-goto").remove();

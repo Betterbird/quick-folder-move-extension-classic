@@ -492,63 +492,57 @@ var quickmove = (function() {
       quickmove.hide(popup, isContext);
     },
 
-    openMove: function() {
+    openPopup: function(popupName, preferFolderTree = false) {
+      // The desired behaviour (as for TB/BB 102) is this:
+      // Shift+M/Y open over the thread pane or the stand-alone message.
+      // Shift+G open over the folder tree.
+      // XXX TODO: Make it work for stand-alone messages.
       let tabmail = top.document.getElementById("tabmail");
-      let threadTree = tabmail?.currentAbout3Pane?.threadTree;
-      let messagepane = document.getElementById("messagepane");
-      if (threadTree) {
+      let currentAbout3Pane = tabmail?.currentAbout3Pane;
+      let currentAboutMessage = tabmail?.currentAboutMessage;
+      let threadTree = currentAbout3Pane?.threadTree;
+      let messagepane = currentAboutMessage?.document.getElementById("messagepane");
+      let folderTree = currentAbout3Pane?.document.getElementById("folderTree");
+      // console.log(currentAbout3Pane, currentAboutMessage, threadTree, messagepane, folderTree);
+      if (!preferFolderTree && threadTree) {
         // If there is a thread tree (i.e mail 3pane), then use it
-        let filepopup = document.getElementById("quickmove-menupopup");
         // XXX TODO.
         // let threadTreeCols = document.getElementById("threadCols");
         // let selection = threadTree.view.selection;
         // let rowOffset =
           // threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
           // threadTreeCols.clientHeight;
-        filepopup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
-      } else if (messagepane) {
-        let filepopup = document.getElementById("quickmove-menupopup");
-        filepopup.openPopup(messagepane, "overlap");
+        let popup = document.getElementById(popupName);
+        popup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
+      } else if (!preferFolderTree && messagepane) {
+        let popup = document.getElementById(popupName);
+        popup.openPopup(messagepane, "overlap");
+      } else if (folderTree) {
+        let popup = document.getElementById(popupName);
+        popup.openPopup(folderTree, "overlap");
       } else {
         Cu.reportError("Couldn't find a node to open the panel on");
       }
     },
 
-    // XXX TODO: Needs work. quickmove-folderlocation-menupopup was renamed.
-    openGoto: function() {
-      let folderLocation = document.getElementById("locationFolders");
-      let folderTree = document.getElementById("folderTree");
+    openMove: function() {
+      this.openPopup("quickmove-move-menupopup");
+    },
 
-      if (folderLocation) {
-        // There is a folder location popup, open its popup
-        let menupopup = document.getElementById("quickmove-folderlocation-menupopup");
+    openGoto: function() {
+      // There is a folder location popup, open its popup.
+      let menupopup = document.getElementById("toolbarFolderLocationPopup");
+      if (menupopup) {
+        let toolbar = document.getElementById("unifiedToolbarContent");
+        let folderLocation = toolbar.querySelector(".folder-location")
         menupopup.openPopup(folderLocation, "after_start");
-      } else if (folderTree) {
-        let popup = document.getElementById("quickmove-goto-menupopup");
-        popup.openPopup(folderTree, "overlap");
+        return;
       }
+      this.openPopup("toolbarFolderLocationPopup", true);
     },
 
     openCopy: function() {
-      let tabmail = top.document.getElementById("tabmail");
-      let threadTree = tabmail?.currentAbout3Pane?.threadTree;
-      let messagepane = document.getElementById("messagepane");
-      if (threadTree) {
-        // If there is a thread tree (i.e mail 3pane), then use it
-        let filepopup = document.getElementById("quickmove-copy-menupopup");
-        // XXX TODO.
-        // let threadTreeCols = document.getElementById("threadCols");
-        // let selection = threadTree.view.selection;
-        // let rowOffset =
-          // threadTree.rowHeight * (selection.currentIndex - threadTree.getFirstVisibleRow() + 1) +
-          // threadTreeCols.clientHeight;
-        filepopup.openPopup(threadTree, "overlap"); // , threadTreeCols.clientHeight, rowOffset);
-      } else if (messagepane) {
-        let filepopup = document.getElementById("quickmove-copy-menupopup");
-        filepopup.openPopup(messagepane, "overlap");
-      } else {
-        Cu.reportError("Couldn't find a node to open the panel on");
-      }
+      this.openPopup("quickmove-copy-menupopup");
     },
 
     hide: function(popup, isContext = false) {
