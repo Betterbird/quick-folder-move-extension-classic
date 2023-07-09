@@ -534,9 +534,11 @@ var quickmove = (function() {
       let menupopup = document.getElementById("toolbarFolderLocationPopup");
       if (menupopup) {
         let toolbar = document.getElementById("unifiedToolbarContent");
-        let folderLocation = toolbar.querySelector(".folder-location")
-        menupopup.openPopup(folderLocation, "after_start");
-        return;
+        let folderLocation = toolbar?.querySelector(".folder-location")
+        if (folderLocation) {
+          menupopup.openPopup(folderLocation, "after_start");
+          return;
+        }
       }
       this.openPopup("toolbarFolderLocationPopup", true);
     },
