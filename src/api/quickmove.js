@@ -92,11 +92,10 @@ function initKeys(window, document) {
 }
 
 function initContextMenus(window, document, standAlone) {
-  let tabmail = window.top.document.getElementById("tabmail");
   let doc = standAlone ? document.getElementById("messageBrowser").contentDocument
-                       : tabmail?.currentAbout3Pane?.document;
+                       : document.getElementById("tabmail")?.currentAbout3Pane?.document;
   if (!doc) {
-    console.log("QFM: tabmail not initialised yet");
+    console.log("QFM: can't get document to work on");
     return;
   }
   let moveMenu = doc.getElementById("mailContext-moveMenu");
@@ -217,13 +216,25 @@ this.quickmove = class extends ExtensionAPI {
         let standAlone = window.location.href.startsWith("chrome://messenger/content/messageWindow.");
 
         // The following call needs tabmail setup, so it won't work straight away.
-        // Hack it with a timeout for now. Maybe we can listen to some event instead.
-        window.setTimeout(() => initContextMenus(window, document, standAlone), 3000);
+        // It would be nice to listen to "mail-startup-done", but that only fires for the first window.
+        // So let's wait for tabmail and all the other stuff we need.
+        if (!standAlone) {
+          let count = 0;
+          while (count++ < 50 &&
+            // .currentAbout3Pane throws if .currentTabInfo isn't available yet, so test it first.
+            !(document.getElementById("tabmail")?.currentTabInfo && 
+              document.getElementById("tabmail")?.currentAbout3Pane?.document.getElementById("mailContext-moveMenu") &&
+              document.getElementById("tabmail")?.currentAbout3Pane?.document.getElementById("mailContext-copyMenu") &&
+              document.getElementById("toolbarFolderLocationPopup"))) {
+            await new Promise(r => window.setTimeout(r, 100));
+          }
+        }
+        initContextMenus(window, document, standAlone);
 
         if (standAlone) {
           document.getElementById("quickmove-goto").remove();
         } else {
-          window.setTimeout(() => initFolderLocation(window, document), 3000);
+          initFolderLocation(window, document);
         }
       },
     });
