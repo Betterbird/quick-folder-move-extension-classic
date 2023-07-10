@@ -92,8 +92,9 @@ function initKeys(window, document) {
 }
 
 function initContextMenus(window, document, standAlone) {
-  let doc = standAlone ? document.getElementById("messageBrowser").contentDocument
-                       : document.getElementById("tabmail")?.currentAbout3Pane?.document;
+  let doc = standAlone
+    ? document.getElementById("messageBrowser").contentDocument
+    : document.getElementById("tabmail")?.currentAbout3Pane?.document;
   if (!doc) {
     console.log("QFM: can't get document to work on");
     return;
@@ -167,8 +168,7 @@ function initFolderLocation(window, document) {
     </menupopup>
   `);
 
-  let folderLocationPopup =
-    document.getElementById("toolbarFolderLocationPopup");
+  let folderLocationPopup = document.getElementById("toolbarFolderLocationPopup");
   if (!folderLocationPopup) {
     console.log("QFM: toolbarFolderLocationPopup not initialised yet");
     return;
@@ -177,11 +177,10 @@ function initFolderLocation(window, document) {
   folderLocationPopup.parentNode.appendChild(quickmoveLocationPopup);
 
   window.quickmove.cleanup.push(() => {
-    let folderLocationPopupRetired =
-      document.getElementById("toolbarFolderLocationPopup-retired");
+    let folderLocationPopupRetired = document.getElementById("toolbarFolderLocationPopup-retired");
     if (folderLocationPopupRetired) {
-      let folderLocationPopup =
-        document.getElementById("toolbarFolderLocationPopup");
+      // eslint-disable-next-line no-shadow
+      let folderLocationPopup = document.getElementById("toolbarFolderLocationPopup");
       if (folderLocationPopup) {
         folderLocationPopup.remove();
       }
@@ -213,19 +212,30 @@ this.quickmove = class extends ExtensionAPI {
         initCSS(window, document);
         initKeys(window, document);
 
-        let standAlone = window.location.href.startsWith("chrome://messenger/content/messageWindow.");
+        let standAlone = window.location.href.startsWith(
+          "chrome://messenger/content/messageWindow."
+        );
 
         // The following call needs tabmail setup, so it won't work straight away.
         // It would be nice to listen to "mail-startup-done", but that only fires for the first window.
         // So let's wait for tabmail and all the other stuff we need.
         if (!standAlone) {
           let count = 0;
-          while (count++ < 50 &&
+          while (
+            count++ < 50 &&
             // .currentAbout3Pane throws if .currentTabInfo isn't available yet, so test it first.
-            !(document.getElementById("tabmail")?.currentTabInfo && 
-              document.getElementById("tabmail")?.currentAbout3Pane?.document.getElementById("mailContext-moveMenu") &&
-              document.getElementById("tabmail")?.currentAbout3Pane?.document.getElementById("mailContext-copyMenu") &&
-              document.getElementById("toolbarFolderLocationPopup"))) {
+            !(
+              document.getElementById("tabmail")?.currentTabInfo &&
+              document
+                .getElementById("tabmail")
+                ?.currentAbout3Pane?.document.getElementById("mailContext-moveMenu") &&
+              document
+                .getElementById("tabmail")
+                ?.currentAbout3Pane?.document.getElementById("mailContext-copyMenu") &&
+              document.getElementById("toolbarFolderLocationPopup")
+            )
+          ) {
+            // eslint-disable-next-line id-length
             await new Promise(r => window.setTimeout(r, 100));
           }
         }

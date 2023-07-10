@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2009-2019 */
 
-/* global Services, GetMessagePaneFrame, fixIterator, MailServices, MsgCopyMessage,
- *        MsgMarkMsgAsRead, MsgMoveMessage, gFolderTreeView */
+/* global Services, GetMessagePaneFrame, MailServices, goDoCommand */
 
 "use strict";
 
@@ -364,7 +363,7 @@ var quickmove = (function() {
       }
     },
 
-    searchDelayed: Quickmove.debounce(function(textboxNode, useDocument = false) {
+    searchDelayed: Quickmove.debounce((textboxNode, useDocument = false) => {
       quickmove.search(textboxNode, useDocument);
     }, 500),
 
@@ -375,7 +374,7 @@ var quickmove = (function() {
     executeMove: async function(folder, copyNotMove) {
       if (copyNotMove) {
         // MsgCopyMessage(folder); // Doesn't exist any more.
-        goDoCommand('cmd_copyMessage', folder);
+        goDoCommand("cmd_copyMessage", folder);
       } else {
         if (await Quickmove.getPref("markAsRead", true)) {
           // This doesn't work in 115 any more.
@@ -384,14 +383,12 @@ var quickmove = (function() {
           // message is read anyway.
           let tabmail = document.getElementById("tabmail");
           if (tabmail) {
-            tabmail.currentAbout3Pane.gDBView.doCommand(
-              Ci.nsMsgViewCommandType.markMessagesRead
-            );
+            tabmail.currentAbout3Pane.gDBView.doCommand(Ci.nsMsgViewCommandType.markMessagesRead);
           }
         }
 
         // MsgMoveMessage(folder); // Doesn't exist any more.
-        goDoCommand('cmd_moveMessage', folder);
+        goDoCommand("cmd_moveMessage", folder);
       }
     },
 
@@ -502,7 +499,8 @@ var quickmove = (function() {
       let currentAbout3Pane = tabmail?.currentAbout3Pane;
       let currentAboutMessage = tabmail?.currentAboutMessage;
       let threadTree = currentAbout3Pane?.threadTree;
-      let doc = currentAboutMessage?.document || document.getElementById("messageBrowser").contentDocument;
+      let doc =
+        currentAboutMessage?.document || document.getElementById("messageBrowser").contentDocument;
       let messagepane = doc?.getElementById("messagepane");
       let folderTree = currentAbout3Pane?.document.getElementById("folderTree");
       // console.log(currentAbout3Pane, currentAboutMessage, threadTree, messagepane, folderTree);
@@ -535,7 +533,7 @@ var quickmove = (function() {
       let menupopup = document.getElementById("toolbarFolderLocationPopup");
       if (menupopup) {
         let toolbar = document.getElementById("unifiedToolbarContent");
-        let folderLocation = toolbar?.querySelector(".folder-location")
+        let folderLocation = toolbar?.querySelector(".folder-location");
         if (folderLocation) {
           menupopup.openPopup(folderLocation, "after_start");
           return;

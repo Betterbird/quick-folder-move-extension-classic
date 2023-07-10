@@ -18,6 +18,7 @@
     "clean": "rm dist/quickmove.xpi",
     "bump": "bumper() { bump package.json \"$1\"; bump src/manifest.json \"$1\"; }; bumper",
     "tag": "git tag v$(jq -r '.version' src/manifest.json)",
+    "lint0": ".\\node_modules\\.bin\\eslint src",
     "lint": "commitlint -f origin/master && eslint src || true"
   },
   "devDependencies": {
