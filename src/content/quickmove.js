@@ -377,10 +377,18 @@ var quickmove = (function() {
         // MsgCopyMessage(folder); // Doesn't exist any more.
         goDoCommand('cmd_copyMessage', folder);
       } else {
-        // XXX TODO: Mark as read.
-        // if (await Quickmove.getPref("markAsRead", true)) {
-        //   MsgMarkMsgAsRead(true);  // Has moved elsewhere.
-        // }
+        if (await Quickmove.getPref("markAsRead", true)) {
+          // This doesn't work in 115 any more.
+          // MsgMarkMsgAsRead(true);
+          // This won't work in the message pane, but then the
+          // message is read anyway.
+          let tabmail = document.getElementById("tabmail");
+          if (tabmail) {
+            tabmail.currentAbout3Pane.gDBView.doCommand(
+              Ci.nsMsgViewCommandType.markMessagesRead
+            );
+          }
+        }
 
         // MsgMoveMessage(folder); // Doesn't exist any more.
         goDoCommand('cmd_moveMessage', folder);
