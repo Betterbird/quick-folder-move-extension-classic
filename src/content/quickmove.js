@@ -399,6 +399,8 @@ var quickmove = (function() {
       // So we use a trick from here:
       // https://searchfox.org/comm-central/search?q=tab.*folder+%3D+folder&path=&case=false&regexp=true
       let tabmail = document.getElementById("tabmail");
+      // Something like this could also work:
+      // tabmail.currentAbout3Pane.displayFolder(folder);
       let tab = tabmail.currentTabInfo;
       tab.folder = folder;
     },
