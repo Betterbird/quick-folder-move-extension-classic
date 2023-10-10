@@ -502,7 +502,7 @@ var quickmove = (function() {
       let currentAboutMessage = tabmail?.currentAboutMessage;
       let threadTree = currentAbout3Pane?.threadTree;
       let doc =
-        currentAboutMessage?.document || document.getElementById("messageBrowser").contentDocument;
+        currentAboutMessage?.document || document.getElementById("messageBrowser")?.contentDocument;
       let messagepane = doc?.getElementById("messagepane");
       let folderTree = currentAbout3Pane?.document.getElementById("folderTree");
       // console.log(currentAbout3Pane, currentAboutMessage, threadTree, messagepane, folderTree);
