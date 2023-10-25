@@ -445,36 +445,6 @@ var quickmove = (function() {
       } else if (event.keyCode == event.DOM_VK_DOWN && !popup.lastChild.disabled) {
         popup.removeAttribute("ignorekeys");
         popup.firstChild.blur();
-
-        // Synthesize another keydown/up cycle, this ensures the first menuitem
-        // is actually focused.
-        let keyEvent = document.createEvent("KeyboardEvent");
-        keyEvent.initKeyEvent(
-          "keydown",
-          true,
-          true,
-          null,
-          false,
-          false,
-          false,
-          false,
-          keyEvent.DOM_VK_DOWN,
-          0
-        );
-        popup.dispatchEvent(keyEvent);
-        keyEvent.initKeyEvent(
-          "keyup",
-          true,
-          true,
-          null,
-          false,
-          false,
-          false,
-          false,
-          keyEvent.DOM_VK_DOWN,
-          0
-        );
-        popup.dispatchEvent(keyEvent);
       } else {
         // If something was typed, then remember that we haven't searched yet.
         quickmove.dirty = true;
