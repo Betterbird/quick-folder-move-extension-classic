@@ -3,12 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * Portions Copyright (C) Philipp Kewisch, 2019-2020 */
 
-const { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-
+const { ExtensionCommon } = ChromeUtils.importESModule("resource://gre/modules/ExtensionCommon.sys.mjs");
 const { ExtensionAPI } = ExtensionCommon;
-
-const { ExtensionSupport } = ChromeUtils.import("resource:///modules/ExtensionSupport.jsm");
+const { ExtensionSupport } = ChromeUtils.importESModule("resource:///modules/ExtensionSupport.sys.mjs");
 
 function initScript(window, document) {
   Services.scriptloader.loadSubScript("chrome://quickmove/content/quickmove.js", window);

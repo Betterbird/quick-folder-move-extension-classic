@@ -10,8 +10,8 @@
 var quickmove = (function() {
   const ADDON_ID = "qfm-classic@betterbird.eu";
 
-  let { MultiSuffixTree } = ChromeUtils.import("resource:///modules/gloda/SuffixTree.jsm");
-  let { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
+  let { MultiSuffixTree } = ChromeUtils.importESModule("resource:///modules/gloda/SuffixTree.sys.mjs");
+  let { ExtensionParent } = ChromeUtils.importESModule("resource://gre/modules/ExtensionParent.sys.mjs");
 
   let Quickmove = {
     getWXAPI(name, sync = false) {
