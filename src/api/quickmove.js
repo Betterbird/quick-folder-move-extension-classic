@@ -31,9 +31,13 @@ function initCSS(window, document) {
 function initKeys(window, document) {
   // This is necessary so the keys work, however, the menu entries don't appear to be
   // visible on any menu.
+  // Note: ignorekeys is needed to allow input into the text box.
+  // When DOM_VK_DOWN is used, this attribute is removed to allow key navigation
+  // on the list.
   document.getElementById("mainPopupSet").appendChild(
     window.MozXULElement.parseXULToFragment(`
       <menupopup id="quickmove-move-menupopup"
+             ignorekeys="true"
              onpopupshowing="quickmove.popupshowing(event, true)"
              onpopupshown="quickmove.popupshown(event)"
              onpopuphidden="quickmove.hide(event.target)"
@@ -45,6 +49,7 @@ function initKeys(window, document) {
         <menuseparator class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-goto-menupopup"
+                 ignorekeys="true"
                  onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"
@@ -56,6 +61,7 @@ function initKeys(window, document) {
         <menuseparator id="quickmove-goto-separator" class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-copy-menupopup"
+                 ignorekeys="true"
                  onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"

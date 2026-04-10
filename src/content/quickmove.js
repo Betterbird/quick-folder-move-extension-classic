@@ -166,6 +166,11 @@ var quickmove = (function() {
     },
 
     popupshown: function(event) {
+      // Note: Popup navidation with the arrow-keys doesn't create
+      // keyboard events, we can also not intercept shift+tab.
+      // What works is `event.target.addEventListener("DOMMenuItemActive", ...`,
+      // but that is of no use for tracking keyboard events.
+
       // focus the textbox
       event.target.setAttribute("ignorekeys", "true");
       event.target.firstChild.focus();
@@ -450,6 +455,13 @@ var quickmove = (function() {
         // Now hide the popup
         quickmove.hide(popup);
       } else if (event.keyCode == event.DOM_VK_DOWN && !popup.lastChild.disabled) {
+        popup.removeAttribute("ignorekeys");
+        popup.firstChild.blur();
+      } else if (event.key == "Tab" && !popup.lastChild.disabled) {
+        // Hours were spent with ChatGPT and Deepseek to find a way to select
+        // the first element of the popup, but there isn't one.
+        // .selectedItem and .activeChild only works for menulists, .activateItem() executes the command,
+        // .focus() doesn't work. So we give up.
         popup.removeAttribute("ignorekeys");
         popup.firstChild.blur();
       } else {
