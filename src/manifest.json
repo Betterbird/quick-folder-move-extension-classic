@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Quick Folder Move Classic",
   "description": "__MSG_extensionDescription__",
-  "version": "1.108.0",
+  "version": "1.109.0",
   "default_locale": "en",
   "author": "The Betterbird Project, original author: Philipp Kewisch",
   "homepage_url": "https://www.betterbird.eu/addons/",

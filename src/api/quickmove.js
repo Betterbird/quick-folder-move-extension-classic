@@ -34,7 +34,6 @@ function initKeys(window, document) {
   document.getElementById("mainPopupSet").appendChild(
     window.MozXULElement.parseXULToFragment(`
       <menupopup id="quickmove-move-menupopup"
-             ignorekeys="true"
              onpopupshowing="quickmove.popupshowing(event, true)"
              onpopupshown="quickmove.popupshown(event)"
              onpopuphidden="quickmove.hide(event.target)"
@@ -46,7 +45,6 @@ function initKeys(window, document) {
         <menuseparator class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-goto-menupopup"
-                 ignorekeys="true"
                  onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"
@@ -58,7 +56,6 @@ function initKeys(window, document) {
         <menuseparator id="quickmove-goto-separator" class="quickmove-separator"/>
       </menupopup>
       <menupopup id="quickmove-copy-menupopup"
-                 ignorekeys="true"
                  onpopupshowing="quickmove.popupshowing(event, true)"
                  onpopupshown="quickmove.popupshown(event)"
                  onpopuphidden="quickmove.hide(event.target)"
