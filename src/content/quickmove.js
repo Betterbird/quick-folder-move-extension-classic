@@ -47,7 +47,7 @@ var quickmove = (function() {
       let fullPath = [];
 
       while (folder && folder.parent) {
-        fullPath.unshift(folder.prettyName);
+        fullPath.unshift(folder.localizedName);
         folder = folder.parent;
       }
 
@@ -193,7 +193,7 @@ var quickmove = (function() {
 
       // First create a map of pretty names to find possible duplicates.
       for (let folder of folders) {
-        let lowerName = folder.prettyName.toLowerCase();
+        let lowerName = folder.localizedName.toLowerCase();
         let serverLowerName = folder.server.prettyName.toLowerCase();
 
         if (!(lowerName in serverMap)) {
@@ -239,7 +239,7 @@ var quickmove = (function() {
         if (doNotCrop) {
           node.setAttribute("crop", "none");
         }
-        let label = folder.prettyName;
+        let label = folder.localizedName;
         let lowerLabel = label.toLowerCase();
 
         if (lowerLabel in fullPathMap || alwaysShowFullPath) {
@@ -288,7 +288,7 @@ var quickmove = (function() {
         }
         addIfRecent(aFolder);
         allFolders.push(aFolder);
-        allNames.push(aFolder.prettyName.toLowerCase());
+        allNames.push(aFolder.localizedName.toLowerCase());
 
         if (aFolder.hasSubFolders) {
           for (let xFolder of aFolder.subFolders) {
